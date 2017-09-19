@@ -1,4 +1,2 @@
-arq1.txt MD5 [B@135fbaa4
-arq2.txt MD5 [B@4b67cf4d
-arq1.txt MD5 [B@135fbaa4
-arq2.txt MD5 [B@4b67cf4d
+arq1.txt MD5 a01830ba7d9ca42b099fc576723bf5e2 SHA1 7d5c82b89cff0b1a7f788853af513eafdbd4b91c
+arq2.txt MD5 1a7071fa44110972dab1bb4480bdb1a6 SHA1 5f244afc89fd7ef091cbc30bb77e784bff988bfa
