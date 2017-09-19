@@ -139,12 +139,12 @@ public class DigestCalculator {
 				
 				if (colisaoInfo != null) {
 					// STATUS COLISION
-					System.out.println("COLISION");
+					System.out.println("COLISION com arquivo");
 				
 				}
 				else {
 					// STATUS NOT OK, encontrou arquivo, mas nao colide
-					System.out.println("NOT OK com arquivo");
+					System.out.println("NOT OK");
 				}
 			}
 		}
@@ -152,8 +152,8 @@ public class DigestCalculator {
 			// nao encontrou arquivo
 			ArqInfo colisaoInfo = buscaInfoPorHash(digest);
 			if (colisaoInfo != null) {
-				// STATUS NOT OK, nao encontrou arquivo, mas colide
-				System.out.println("NOT OK sem aruivo");
+				// STATUS COLISION, nao encontrou arquivo, mas colide
+				System.out.println("COLISION sem aruivo");
 			
 			}
 			else {
@@ -227,7 +227,7 @@ public class DigestCalculator {
 	
 	public ArqInfo buscaInfoPorHash(String value) {
 		for (ArqInfo i: this.infoListaDigest) {
-			if ((this.tipoDigest.equals("MD5") && value.equals(i.hashMD5))|| (this.tipoDigest.equals("MD5") && value.equals(i.hashSHA1))) {
+			if ((this.tipoDigest.equals("MD5") && value.equals(i.hashMD5)) || (this.tipoDigest.equals("SHA1") && value.equals(i.hashSHA1))) {
 				return i;
 			}
 		}
