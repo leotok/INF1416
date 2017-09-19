@@ -38,17 +38,15 @@ public class DigestCalculator {
 		calculator.setTipoDigest(args[0]);
 		calculator.setInfoListaDigest(args[1]);
 		
-		System.out.println(calculator.tipoDigest);
-		
 		for (int i = 2; i < args.length; i++) {
-			System.out.println(args[i]);
 			caminhosArqs.add(args[i]);
 		}
 		
 		for (String arq: caminhosArqs) {
 			String digest = calculator.calculaDigest(arq);
 			if (digest != null) {
-				calculator.procuraDigest(arq, digest);
+				String status = calculator.procuraDigest(arq, digest);
+				System.out.println(String.format("%s %s %s %s", arq, calculator.tipoDigest, digest, status));
 			}
 		}
 		calculator.saveInfoToFile();
@@ -58,13 +56,9 @@ public class DigestCalculator {
 	
 	
 	void saveInfoToFile() {
-		System.out.println("\nSalvando arquivo:");
 		String content = "";
 		
 		for (ArqInfo i: this.infoListaDigest) {
-			System.out.println(i.nomeArq);
-			System.out.println(i.hashMD5);
-			System.out.println(i.hashSHA1);
 			
 			if (i.hashMD5 != null && i.hashSHA1 != null) {
 				content += String.format("%s %s %s %s %s\n", i.nomeArq, "MD5", i.hashMD5, "SHA1", i.hashSHA1);
@@ -101,10 +95,7 @@ public class DigestCalculator {
 			return null;
 		}
 		
-		System.out.print("Conteudo:");
-		
 		for (String str: content) {
-			System.out.println(str);
 			this.messageDigest.update(str.getBytes());	
 		}
 		
@@ -112,9 +103,7 @@ public class DigestCalculator {
 		
 	}
 
-	boolean procuraDigest(String caminhoArq, String digest) {
-		System.out.print("Procurando digest:");
-		System.out.println(digest);
+	String procuraDigest(String caminhoArq, String digest) {
 		
 		ArqInfo info = buscaInfoPorNomeArq(caminhoArq);
 		
@@ -122,15 +111,15 @@ public class DigestCalculator {
 			// encontrou arquivo
 			if ((this.tipoDigest.equals("MD5") && digest.equals(info.hashMD5)) || (this.tipoDigest.equals("SHA1") && digest.equals(info.hashSHA1))) {
 				// STATUS OK - arquivo encontrado contem o mesmo digest
-				System.out.println("OK");
-				
+				return "OK";
 			}
 			else if ((this.tipoDigest.equals("MD5") && info.hashMD5 == null) || (this.tipoDigest.equals("SHA1") && info.hashSHA1 == null)) {
 				// Arquivo existe, mas nao existe o Hash em questao, apenas o outro
-				System.out.println("Existe, mas nao com esse tipo de hash");
 				
 				if (this.tipoDigest.equals("MD5")) info.hashMD5 = digest;
 				else if (this.tipoDigest.equals("SHA1")) info.hashSHA1 = digest;
+				
+				return "NOT FOUND";
 				
 			}
 			else {
@@ -139,12 +128,12 @@ public class DigestCalculator {
 				
 				if (colisaoInfo != null) {
 					// STATUS COLISION
-					System.out.println("COLISION com arquivo");
+					return "COLISION";
 				
 				}
 				else {
 					// STATUS NOT OK, encontrou arquivo, mas nao colide
-					System.out.println("NOT OK");
+					return "NOT OK";
 				}
 			}
 		}
@@ -153,33 +142,28 @@ public class DigestCalculator {
 			ArqInfo colisaoInfo = buscaInfoPorHash(digest);
 			if (colisaoInfo != null) {
 				// STATUS COLISION, nao encontrou arquivo, mas colide
-				System.out.println("COLISION sem aruivo");
+				return "COLISION";
 			
 			}
 			else {
 				// STATUS NOT FOUND
-				System.out.println("NOT FOUND");
 				// cria novo ArqInfo e adiciona a lista. Um dos campos de hash deve ser null
 				
 				ArqInfo novoInfo = new ArqInfo();
 				novoInfo.nomeArq = caminhoArq;
 				
-				System.out.println(this.tipoDigest);
 				if (this.tipoDigest.equals("MD5")) {
-					System.out.println("Salvando MD5");
 					novoInfo.hashMD5 = digest;
 				}
 				else if (this.tipoDigest.equals("SHA1")) {
-					System.out.println("Salvando SHA1");
 					novoInfo.hashSHA1 = digest;
 				}
 				
 				this.infoListaDigest.add(novoInfo);
+				return "NOT FOUND";
 			}
 			
 		}
-		
-		return true;
 	}
 	
 	public void setTipoDigest(String tipo) throws NoSuchAlgorithmException {
@@ -189,13 +173,11 @@ public class DigestCalculator {
 
 	public void setInfoListaDigest(String caminhoArqListaDigest) {
 		
-		System.out.println(caminhoArqListaDigest);
 		List<String> content = null;
 		try{
 			content = Files.readAllLines(Paths.get(caminhoArqListaDigest));
 		}
 		catch (IOException e) {
-			System.out.println(String.format("Failed to read file %s", caminhoArqListaDigest));
 			return;
 		}
 		
