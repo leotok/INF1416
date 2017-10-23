@@ -8,13 +8,13 @@ import javax.swing.JPanel;
 
 public class FirstBody extends JPanel {
 
-	public FirstBody(int totalAccess) {
+	public FirstBody(String subHeader, int totalAccess) {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setBounds(80, 100, 300, 30);
 		
 		this.setBackground(Color.GREEN);
 		
-		JLabel totalAccessLabel = new JLabel(String.format("Total de acessos: %d", totalAccess));
+		JLabel totalAccessLabel = new JLabel(String.format("%s: %d",subHeader, totalAccess));
 		add(totalAccessLabel);
 	
 	}
