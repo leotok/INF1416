@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<item value="/Users/LeoWajnsztok/Documents/PUC/INF1416/Trabalho_3" key="org.eclipse.jdt.ui.lastextjar"/>
 	<item value="/Users/LeoWajnsztok/Documents/PUC/INF1416/Trabalho1" key="org.eclipse.jdt.ui.last.external.project"/>
 	<section name="RefactoringWizard.preview">
 		<item value="600" key="width"/>
@@ -28,8 +29,11 @@
 		<item value="true" key="org.eclipse.jdt.ui.typecomment.deprecated"/>
 	</section>
 	<section name="quick_assist_proposal_size">
-		<item value="500" key="size.y"/>
-		<item value="272" key="size.x"/>
+		<item value="755" key="size.y"/>
+		<item value="742" key="size.x"/>
+	</section>
+	<section name="BuildPathsPropertyPage">
+		<item value="2" key="pageIndex"/>
 	</section>
 	<section name="completion_proposal_size">
 	</section>
