@@ -37,6 +37,7 @@ CREATE TABLE TanList (
   email TEXT NOT NULL,
   tan TEXT NOT NULL,
   usada BOOL DEFAULT 0,
+   posicao INTEGER NOT NULL,
   -- PRIMARY KEY(id, email),
   FOREIGN KEY(email) REFERENCES User(email)
 );
@@ -124,13 +125,13 @@ CT7m2DpJjlWMo/UN2ktydqfei93lazfHA2WlD/SCuTfiBCtyw7N9JH/260Htx7Vy
 GKN0agqcnUjcMNJJ6FV2YUVAOB40PhXcnpSPXPjh1NnT/nx4ip5nibY=
 -----END CERTIFICATE-----', 0); -- Pass CAFEBE
 
-INSERT INTO TanList VALUES(1, 'user01@inf1416.puc-rio.br', 'P6YV1', 0);
-INSERT INTO TanList VALUES(2, 'user01@inf1416.puc-rio.br', 'EVQ23', 0);
-INSERT INTO TanList VALUES(3, 'user01@inf1416.puc-rio.br', 'TP2M2', 0);
-INSERT INTO TanList VALUES(4, 'user01@inf1416.puc-rio.br', '5GHF4', 0);
-INSERT INTO TanList VALUES(5, 'user01@inf1416.puc-rio.br', 'S7HV5', 0);
-INSERT INTO TanList VALUES(6, 'user01@inf1416.puc-rio.br', 'LQ976', 0);
-INSERT INTO TanList VALUES(7, 'user01@inf1416.puc-rio.br', 'SNQJ7', 0);
-INSERT INTO TanList VALUES(8, 'user01@inf1416.puc-rio.br', 'DR6S8', 0);
-INSERT INTO TanList VALUES(9, 'user01@inf1416.puc-rio.br', 'DRIL9', 0);
-INSERT INTO TanList VALUES(10, 'user01@inf1416.puc-rio.br', '5K202', 0);
+INSERT INTO TanList VALUES(1, 'user01@inf1416.puc-rio.br', 'P6YV1', 0, 0);
+INSERT INTO TanList VALUES(2, 'user01@inf1416.puc-rio.br', 'EVQ23', 0, 1);
+INSERT INTO TanList VALUES(3, 'user01@inf1416.puc-rio.br', 'TP2M2', 0, 2);
+INSERT INTO TanList VALUES(4, 'user01@inf1416.puc-rio.br', '5GHF4', 0, 3);
+INSERT INTO TanList VALUES(5, 'user01@inf1416.puc-rio.br', 'S7HV5', 0, 4);
+INSERT INTO TanList VALUES(6, 'user01@inf1416.puc-rio.br', 'LQ976', 0, 5);
+INSERT INTO TanList VALUES(7, 'user01@inf1416.puc-rio.br', 'SNQJ7', 0, 6);
+INSERT INTO TanList VALUES(8, 'user01@inf1416.puc-rio.br', 'DR6S8', 0, 7);
+INSERT INTO TanList VALUES(9, 'user01@inf1416.puc-rio.br', 'DRIL9', 0, 8);
+INSERT INTO TanList VALUES(10, 'user01@inf1416.puc-rio.br', '5K202', 0, 9);

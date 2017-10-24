@@ -29,6 +29,17 @@ public class Auth {
 //	TODO:
 //	- TAN list
 	
+	public static boolean verificaArvoreSenha(Node root, HashMap user, String senhaFormada) {
+		if (root.dir == null && root.esq == null) {
+//			System.out.println(senhaFormada);
+			return Auth.autenticaSenha(senhaFormada, user);
+		}
+		boolean ret1 = verificaArvoreSenha(root.esq, user, senhaFormada + root.esq.opcao);
+		boolean ret2 = verificaArvoreSenha(root.dir, user, senhaFormada + root.dir.opcao);
+		
+		return ret1 || ret2;
+	}
+	
 	public static boolean acessarArquivo(HashMap user, String index, String nomeArquivo, PrivateKey chavePrivada, String pastaArquivos) {
 		try {
 			String[] linhasIndex = index.split("\n");
@@ -238,8 +249,8 @@ public class Auth {
 			List<String> list = new ArrayList<String>();
 			for (int i = 0; i < num; i++) {
 				String tan = Auth.geraTan();
-				list.add(tan);
-				DBManager.insereTan(tan, email);
+				list.add(Integer.toString(i) +" "+ tan);
+				DBManager.insereTan(tan, email, i);
 			}
 			Files.write(Paths.get(path + "/tanList.txt"), String.join("\n", list).getBytes());
 			return list;

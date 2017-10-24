@@ -14,9 +14,8 @@ public class MainButtons extends JPanel {
 
 	public MainButtons() {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		setBounds(80, 150, 350, 200);
+		setBounds(30, 150, 350, 200);
 		
-		this.setBackground(Color.RED);
 		
 		JLabel mainManu = new JLabel("Menu principal:");
 		

@@ -58,8 +58,8 @@ public class DBManager {
 		return selectFromDb(String.format("SELECT * FROM TanList WHERE email = '%s' AND usada = 0", email));
 	}
 	
-	public static boolean insereTan(String tan, String email) {
-		return insertIntoDb(String.format("INSERT INTO TanList (email, tan, usada) VALUES ('%s', '%s', 0)", email, tan));
+	public static boolean insereTan(String tan, String email, int posicao) {
+		return insertIntoDb(String.format("INSERT INTO TanList (email, tan, usada, posicao) VALUES ('%s', '%s', 0, %d)", email, tan, posicao));
 	}
 	
 	public static List getUser(String email) throws ClassNotFoundException {
