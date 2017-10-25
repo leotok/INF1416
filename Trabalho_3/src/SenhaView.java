@@ -55,7 +55,7 @@ public class SenhaView extends JFrame {
 		
 		for (int i=0; i<5; i++) {
 			JButton senhaButton = new JButton(String.join(" ", opcoes.get(i)));
-			senhaButton.setBounds(30 + (i * 55), 300, 50, 50);
+			senhaButton.setBounds(30 + (i * 65), 300, 60, 60);
 			senhaButton.addActionListener(new ActionListener () {
 				public void actionPerformed (ActionEvent e) {
 					if (numCliques == 8) {

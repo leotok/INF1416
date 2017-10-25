@@ -31,6 +31,10 @@ public class DBManager {
 		return null;
 	}
 	
+	public static List getLog() {
+		return selectFromDb("select Registro.id, email, texto from Registro JOIN Mensagem ON Mensagem.id = Registro.messageId order by Registro.id, created;");
+	}
+	
 	public static boolean addUser(String name, String email, String group, String salt, String senha, String certDig) {
 		return insertIntoDb(String.format("INSERT INTO User VALUES "
 				+ "('%s', '%s', '%s', '%s', '%s', 1, 0, null, 0, 0, '%s', 0, 0)"
