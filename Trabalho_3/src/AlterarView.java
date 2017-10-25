@@ -22,6 +22,7 @@ public class AlterarView extends JFrame {
 	
 	public AlterarView (HashMap user) {
 		this.user = user;
+		DBManager.insereRegistro(7001, (String) user.get("email"));
 		
 		setLayout(null);
 		setSize (this.width, this.height);
@@ -105,6 +106,8 @@ public class AlterarView extends JFrame {
 		c.add(alterarButton);
 		alterarButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
+				DBManager.insereRegistro(7007, (String) user.get("email"));
+				
 				String errorMsg = "";
 				String senha = new String( senhaField.getPassword());
 				if (senha.isEmpty() == false) {
@@ -112,6 +115,7 @@ public class AlterarView extends JFrame {
 					if (senha.equals(confirmacao)) {
 						if (Auth.verificaRegrasSenha(senha) == false) {
 							errorMsg += "Senha não está de acordo com a regra.\n";
+							DBManager.insereRegistro(7002, (String) user.get("email"));
 						} 
 						else {
 							senha = Auth.geraSenhaProcessada(senha, (String) user.get("salt"));
@@ -120,6 +124,7 @@ public class AlterarView extends JFrame {
 					}
 					else {
 						errorMsg += "Senha e confirmação de senha não são iguais.\n";
+						DBManager.insereRegistro(7002, (String) user.get("email"));
 					}
 				}
 				
@@ -131,10 +136,27 @@ public class AlterarView extends JFrame {
 						certDigBytes = Files.readAllBytes(cdPath);
 					} catch (Exception a) {
 						a.printStackTrace();
+						DBManager.insereRegistro(7003, (String) user.get("email"));
 						return;
 					}
 					
 					X509Certificate cert = Auth.leCertificadoDigital(certDigBytes);
+					if (cert ==  null) {
+						DBManager.insereRegistro(7003, (String) user.get("email"));
+						return;
+					}
+					String infoString = cert.getVersion() +"\n"+ cert.getNotBefore() +"\n"+ cert.getType() +"\n"+ cert.getIssuerDN() +"\n"+ cert.getSubjectDN();
+					int ret = JOptionPane.showConfirmDialog(null, infoString);
+					
+					if (ret != JOptionPane.YES_OPTION) {
+						System.out.println("Cancelou");
+						DBManager.insereRegistro(7006, (String) user.get("email"));
+						return;
+					}
+					else {
+						DBManager.insereRegistro(7005, (String) user.get("email"));
+					}
+					
 					String certString = Auth.certToString(cert);
 					DBManager.alterarCertificadoDigital(certString, (String) user.get("email"));
 				}
@@ -142,7 +164,11 @@ public class AlterarView extends JFrame {
 				String pathTanList = tanListLabel.getText();
 				if (pathTanList.isEmpty() == false) {
 					DBManager.descartaTanList((String) user.get("email"));
-					Auth.geraTanList(pathTanList, 10,  (String) user.get("email"));
+					List<String> list = Auth.geraTanList(pathTanList, 10,  (String) user.get("email"));
+					if (list == null) {
+						DBManager.insereRegistro(7004, (String) user.get("email"));
+						return;
+					}
 				}
 				
 				if (errorMsg.isEmpty() == false) {

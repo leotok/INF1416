@@ -19,6 +19,8 @@ public class LoginView extends JFrame {
 	private HashMap user = null;
 	
 	public LoginView() {
+		DBManager.insereRegistro(2001);
+		
 		setLayout(null);
 		setSize (this.width, this.height);
 		setDefaultCloseOperation (EXIT_ON_CLOSE);
@@ -40,6 +42,7 @@ public class LoginView extends JFrame {
 			public void actionPerformed (ActionEvent e) {
 				HashMap user = Auth.autenticaEmail(loginField.getText());
 				if (user == null) {
+					DBManager.insereRegistro(2005, loginField.getText());
 					JOptionPane.showMessageDialog(null, "Usuário não identificado.");
 				}
 				else {
@@ -69,10 +72,13 @@ public class LoginView extends JFrame {
 							user = Auth.autenticaEmail((String) user.get("email"));
 						}
 						else {
+							DBManager.insereRegistro(2004, (String) user.get("email"));
 							JOptionPane.showMessageDialog(null, "Usuário com acesso bloquado.");
 						}
 					}
 					else {
+						DBManager.insereRegistro(2003, (String) user.get("email"));
+						DBManager.insereRegistro(2002);
 						dispose();
 						new SenhaView(user);
 					}

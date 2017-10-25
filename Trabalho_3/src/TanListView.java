@@ -17,6 +17,7 @@ public class TanListView extends JFrame {
 	
 	public TanListView(HashMap user) {
 		this.user = user;
+		DBManager.insereRegistro(4001, (String) user.get("email"));
 		
 		setLayout(null);
 		setSize (this.width, this.height);
@@ -49,7 +50,8 @@ public class TanListView extends JFrame {
 				HashMap updatedUser = Auth.autenticaEmail((String) user.get("email"));
 				Integer acessosNegados = ((Integer) updatedUser.get("numTanErrada"));
 				
-				if (acessosNegados >= 3) {					
+				if (acessosNegados >= 3) {		
+					DBManager.insereRegistro(4007, (String) updatedUser.get("email"));
 					JOptionPane.showMessageDialog(null, "TAN incorreta. Número total de erros atingido. Aguarde até 2 minutos para tentar novamente.");
 					dispose();
 					new LoginView();
@@ -61,6 +63,8 @@ public class TanListView extends JFrame {
 				
 				if (tanInserido.equals(tanEsperado)) {
 					System.out.println("Acertou o TAN");
+					DBManager.insereRegistro(4003, (String) updatedUser.get("email"));
+					DBManager.insereRegistro(4002, (String) updatedUser.get("email"));
 					DBManager.zeraAcessoErrado((String)updatedUser.get("email"));
 					DBManager.marcaTanUsada((String)updatedUser.get("email"), (int)tanList.get(index).get("id"));
 					DBManager.incrementaTotalAcessos((String)updatedUser.get("email"));
@@ -69,7 +73,22 @@ public class TanListView extends JFrame {
 				}
 				else {
 					JOptionPane.showMessageDialog(null, "TAN incorreto.");
+					
 					DBManager.incrementaTanErrada((String)updatedUser.get("email"));
+					updatedUser = Auth.autenticaEmail((String) updatedUser.get("email"));
+					acessosNegados = ((Integer) updatedUser.get("numTanErrada"));
+					
+					if (acessosNegados == 1) {
+						DBManager.insereRegistro(4004, (String) updatedUser.get("email"));
+					}
+					else if (acessosNegados == 2) {
+						DBManager.insereRegistro(4005, (String) updatedUser.get("email"));
+					}
+					else if (acessosNegados == 3) {		
+						DBManager.insereRegistro(4006, (String) updatedUser.get("email"));
+					}
+					
+					
 					tanField.setText("");
 				}
 			}

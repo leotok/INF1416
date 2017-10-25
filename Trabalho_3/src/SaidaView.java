@@ -46,6 +46,7 @@ public class SaidaView extends JFrame {
 			
 			sairOuVoltarButton.addActionListener(new ActionListener () {
 				public void actionPerformed (ActionEvent e) {
+					DBManager.insereRegistro(1002);
 					dispose();
 					System.exit(0);
 				}

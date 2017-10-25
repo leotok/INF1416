@@ -22,6 +22,7 @@ public class CadastroView extends JFrame {
 	
 	public CadastroView(HashMap user) {
 		this.user = user;
+		DBManager.insereRegistro(6001, (String) user.get("email"));
 		
 		setLayout(null);
 		setSize (this.width, this.height);
@@ -113,6 +114,7 @@ public class CadastroView extends JFrame {
 		c.add(cadastrarButton);
 		cadastrarButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
+				DBManager.insereRegistro(6002, (String) user.get("email"));
 			
 				String senha = new String( senhaField.getPassword());
 				String confirmacao = new String(senhaConfirmacaoField.getPassword());
@@ -124,16 +126,25 @@ public class CadastroView extends JFrame {
 					certDigBytes = Files.readAllBytes(cdPath);
 				} catch (Exception a) {
 					a.printStackTrace();
+					DBManager.insereRegistro(6004, (String) user.get("email"));
 					return;
 				}
 				
 				X509Certificate cert = Auth.leCertificadoDigital(certDigBytes);
+				if (cert == null) {
+					DBManager.insereRegistro(6004, (String) user.get("email"));
+					return;
+				}
 				String infoString = cert.getVersion() +"\n"+ cert.getNotBefore() +"\n"+ cert.getType() +"\n"+ cert.getIssuerDN() +"\n"+ cert.getSubjectDN();
 				int ret = JOptionPane.showConfirmDialog(null, infoString);
 				
 				if (ret != JOptionPane.YES_OPTION) {
 					System.out.println("Cancelou");
+					DBManager.insereRegistro(6007, (String) user.get("email"));
 					return;
+				}
+				else {
+					DBManager.insereRegistro(6006, (String) user.get("email"));
 				}
 			
 				
@@ -144,10 +155,12 @@ public class CadastroView extends JFrame {
 						new CadastroView(user);
 					}
 					else {
+						DBManager.insereRegistro(6003, (String) user.get("email"));
 						JOptionPane.showMessageDialog(null, "Não foi possível cadastrar novo usuário.");
 					}
 				}
 				else {
+					DBManager.insereRegistro(6003, (String) user.get("email"));
 					JOptionPane.showMessageDialog(null, "Senha e confirmação de senha não são iguais.");
 				}
 				
@@ -159,6 +172,7 @@ public class CadastroView extends JFrame {
 		c.add(voltarButton);
 		voltarButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
+				DBManager.insereRegistro(6008, (String) user.get("email"));
 				dispose();
 				new MainView(user);
 			}

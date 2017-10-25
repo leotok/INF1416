@@ -25,6 +25,7 @@ public class ConsultarArquivosView extends JFrame {
 	
 	public ConsultarArquivosView(HashMap user) {
 		this.user = user;
+		DBManager.insereRegistro(8001, (String) user.get("email"));
 		
 		setLayout(null);
 		setSize (this.width, this.height);
@@ -116,6 +117,7 @@ public class ConsultarArquivosView extends JFrame {
 		JButton voltarButton = new JButton("Voltar");
 		voltarButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				DBManager.insereRegistro(8006, (String) user.get("email"));
 				dispose();
 				new MainView(user);
 			}
@@ -124,10 +126,18 @@ public class ConsultarArquivosView extends JFrame {
 		JButton listarButton = new JButton("Listar arquivos");
 		listarButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				chavePrivada = Auth.leChavePrivada(chaveSecretaField.getText(), chavePrivadaLabel.getText());
+				DBManager.insereRegistro(8007, (String) user.get("email"));
+				chavePrivada = Auth.leChavePrivada(chaveSecretaField.getText(), chavePrivadaLabel.getText(), user);
+				if (chavePrivada == null) {
+					DBManager.insereRegistro(8003, (String) user.get("email"));
+				}
+				if (Auth.testaChavePrivada(chavePrivada, user)) {
+					DBManager.insereRegistro(8002, (String) user.get("email"));
+				}
+				
 				try {
 					indexArq = new String(Auth.decriptaArquivo(user, consultaLabel.getText(), "index", chavePrivada), "UTF8");
-				} catch (UnsupportedEncodingException e1) {
+				} catch (UnsupportedEncodingException | NullPointerException e1) {
 					JOptionPane.showMessageDialog(null, "Não foi possível listar os arquivos com este credencial.");
 					return;
 				}
@@ -140,6 +150,8 @@ public class ConsultarArquivosView extends JFrame {
 				table.setModel(tableModel);
 				tableModel.fireTableDataChanged();
 				decriptarButton.setEnabled(true);
+				DBManager.insereRegistro(8009, (String) user.get("email"));
+				
 			}
 		});
 		

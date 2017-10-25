@@ -11,6 +11,7 @@ import java.security.cert.X509Certificate;
 
 public class Main {
 	public static void main (String[] args) throws ClassNotFoundException, SQLException {
+		DBManager.insereRegistro(1001);
 		new LoginView();		
 	}
 }

@@ -98,6 +98,7 @@ public class Auth {
 			byte[] arqAsd = Files.readAllBytes(Paths.get(caminho + "/" + filename + ".asd"));
 			if (assinatura.verify(arqAsd) == false) {
 				System.out.println(filename + " pode ter sido adulterado");
+				DBManager.insereRegistro(8005, (String) user.get("email"));
 				return null;
 			}
 			else {
@@ -105,14 +106,13 @@ public class Auth {
 				return index;
 			}
 		} 
-		catch (Exception e) {
-			System.out.println("Falha na decriptacao");
-			e.printStackTrace();
+		catch (Exception IOError) {
+			DBManager.insereRegistro(8008, (String) user.get("email"));
 			return null;
 		}
 	}
 	
-	public static PrivateKey leChavePrivada(String fraseSecreta, String pathString) {
+	public static PrivateKey leChavePrivada(String fraseSecreta, String pathString, HashMap user) {
 		try {			
 			SecureRandom rand = SecureRandom.getInstance("SHA1PRNG", "SUN");
 			rand.setSeed(fraseSecreta.getBytes());
@@ -122,10 +122,24 @@ public class Auth {
 			Key chave = keyGen.generateKey();
 			
 			Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding");
-			cipher.init(Cipher.DECRYPT_MODE, chave);
+			try {
+				cipher.init(Cipher.DECRYPT_MODE, chave);
+			}
+			catch (Exception e) {
+				DBManager.insereRegistro(8004, (String) user.get("email"));
+				return null;
+			}
 			
-			Path path = Paths.get(pathString);
-			byte[] bytes = Files.readAllBytes(path);
+			byte[] bytes = null;
+			try {
+				Path path = Paths.get(pathString);
+				bytes = Files.readAllBytes(path);
+			}
+			catch (Exception e) {
+				DBManager.insereRegistro(8003, (String) user.get("email"));
+				return null;
+			}
+			
 			String chavePrivadaBase64 = new String(cipher.doFinal(bytes), "UTF8");
 			chavePrivadaBase64 = chavePrivadaBase64.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "").trim();
 			byte[] chavePrivadaBytes = DatatypeConverter.parseBase64Binary(chavePrivadaBase64);
@@ -139,7 +153,7 @@ public class Auth {
 		}
 	}
 	
-	public static boolean testaChavePrivada(PrivateKey chavePrivada, String certificadoPem, HashMap user) {
+	public static boolean testaChavePrivada(PrivateKey chavePrivada, HashMap user) {
 		try {
 			byte[] teste = new byte[1024];
 			SecureRandom.getInstanceStrong().nextBytes(teste);
@@ -148,7 +162,7 @@ public class Auth {
 			assinatura.update(teste);
 			byte[] resp = assinatura.sign();
 			
-			PublicKey chavePublica = Auth.leCertificadoDigital(certificadoPem.getBytes()).getPublicKey();
+			PublicKey chavePublica = Auth.leCertificadoDigital(((String) user.get("certificado")).getBytes()).getPublicKey();
 			assinatura.initVerify(chavePublica);
 			assinatura.update(teste);
 			
@@ -224,7 +238,11 @@ public class Auth {
 		
 		boolean ret = DBManager.addUser(nome, email, grupo, salt, senhaProcessada, certToString(cert));
 		if (ret) {
-			Auth.geraTanList(pathTanList, 10, email);
+			List<String> list = Auth.geraTanList(pathTanList, 10,  email);
+			if (list == null) {
+				DBManager.insereRegistro(6005, email);
+				return false;
+			}
 		}
 		return ret;
 	}

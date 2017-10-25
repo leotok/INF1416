@@ -14,6 +14,7 @@ public class MainView extends JFrame {
 	
 	public MainView(HashMap user) {
 		this.user = user;
+		DBManager.insereRegistro(5001, (String) user.get("email"));
 		
 		setLayout(null);
 		setSize (this.width, this.height);
@@ -44,6 +45,7 @@ public class MainView extends JFrame {
 			c.add(cadastroButton);
 			cadastroButton.addActionListener(new ActionListener () {
 				public void actionPerformed (ActionEvent e) {
+					DBManager.insereRegistro(5002, (String) user.get("email"));
 					dispose();
 					new CadastroView(user);
 				}
@@ -55,6 +57,7 @@ public class MainView extends JFrame {
 		c.add(alterarButton);
 		alterarButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
+				DBManager.insereRegistro(5003, (String) user.get("email"));
 				dispose();
 				new AlterarView(Auth.autenticaEmail((String)user.get("email")));
 			}
@@ -65,6 +68,7 @@ public class MainView extends JFrame {
 		c.add(consultarButton);
 		consultarButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
+				DBManager.insereRegistro(5004, (String) user.get("email"));
 				dispose();
 				new ConsultarArquivosView(Auth.autenticaEmail((String)user.get("email")));
 			}
@@ -75,6 +79,7 @@ public class MainView extends JFrame {
 		c.add(sairButton);
 		sairButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
+				DBManager.insereRegistro(5005, (String) user.get("email"));
 				dispose();
 				new SaidaView(Auth.autenticaEmail((String)user.get("email")));
 			}

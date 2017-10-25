@@ -23,6 +23,7 @@ public class SenhaView extends JFrame {
 	
 	public SenhaView(HashMap user) {
 		this.user = user;
+		DBManager.insereRegistro(3001, (String) user.get("email"));
 		
 		setLayout(null);
 		setSize (this.width, this.height);
@@ -79,8 +80,8 @@ public class SenhaView extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				HashMap updatedUser = Auth.autenticaEmail((String) user.get("email"));
 				Integer acessosNegados = ((Integer) updatedUser.get("numAcessoErrados"));
-				
-				if (acessosNegados >= 3) {					
+				if (acessosNegados >= 3) {		
+					DBManager.insereRegistro(3007, (String) updatedUser.get("email"));
 					JOptionPane.showMessageDialog(null, "Senha incorreta. Número total de erros atingido. Aguarde até 2 minutos para tentar novamente.");
 					dispose();
 					new LoginView();
@@ -92,13 +93,29 @@ public class SenhaView extends JFrame {
 					return;
 				}
 				if (Auth.verificaArvoreSenha(root, updatedUser, "")) {
+					DBManager.insereRegistro(3003, (String) updatedUser.get("email"));
+					DBManager.insereRegistro(3002, (String) updatedUser.get("email"));
 					DBManager.zeraAcessoErrado((String)updatedUser.get("email"));
 					dispose();
 					new TanListView(Auth.autenticaEmail((String)updatedUser.get("email")));
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "Senha incorreta");
 					DBManager.incrementaAcessoErrado((String)updatedUser.get("email"));
+					updatedUser = Auth.autenticaEmail((String) updatedUser.get("email"));
+					acessosNegados = ((Integer) updatedUser.get("numAcessoErrados"));
+					
+					if (acessosNegados == 1) {
+						DBManager.insereRegistro(3004, (String) updatedUser.get("email"));
+					}
+					else if (acessosNegados == 2) {
+						DBManager.insereRegistro(3005, (String) updatedUser.get("email"));
+					}
+					else if (acessosNegados == 3) {		
+						DBManager.insereRegistro(3006, (String) updatedUser.get("email"));
+					}
+					
+					JOptionPane.showMessageDialog(null, "Senha incorreta");
+					
 					root = new Node("");;
 					passwordField.setText("");
 					numCliques = 0;
