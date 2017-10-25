@@ -46,17 +46,31 @@ public class TanListView extends JFrame {
 		JButton tanButton = new JButton("Login");
 		tanButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
+				HashMap updatedUser = Auth.autenticaEmail((String) user.get("email"));
+				Integer acessosNegados = ((Integer) updatedUser.get("numTanErrada"));
+				
+				if (acessosNegados >= 3) {					
+					JOptionPane.showMessageDialog(null, "TAN incorreta. Número total de erros atingido. Aguarde até 2 minutos para tentar novamente.");
+					dispose();
+					new LoginView();
+				}
+				
 				String tanInserido = tanField.getText();
+				List<HashMap> tanList = DBManager.retornaTanList((String)user.get("email"));
 				String tanEsperado = (String) tanList.get(index).get("tan");
 				
 				if (tanInserido.equals(tanEsperado)) {
 					System.out.println("Acertou o TAN");
-					DBManager.marcaTanUsada((String)user.get("email"), (int)tanList.get(index).get("id"));
+					DBManager.zeraAcessoErrado((String)updatedUser.get("email"));
+					DBManager.marcaTanUsada((String)updatedUser.get("email"), (int)tanList.get(index).get("id"));
+					DBManager.incrementaTotalAcessos((String)updatedUser.get("email"));
 					dispose();
-					new MainView(user);
+					new MainView(Auth.autenticaEmail((String)updatedUser.get("email")));
 				}
 				else {
-					System.out.println("Errou o TAN");
+					JOptionPane.showMessageDialog(null, "TAN incorreto.");
+					DBManager.incrementaTanErrada((String)updatedUser.get("email"));
+					tanField.setText("");
 				}
 			}
 		});

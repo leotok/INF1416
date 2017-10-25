@@ -4,18 +4,21 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class MainButtons extends JPanel {
 
-	public MainButtons() {
+	public MainButtons(HashMap user) {
 		setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		setBounds(30, 150, 350, 200);
-		
+		JFrame topFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
 		
 		JLabel mainManu = new JLabel("Menu principal:");
 		
@@ -36,6 +39,8 @@ public class MainButtons extends JPanel {
 		consultarButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
 				System.out.println("Consultar pasta de arquivos secretos");
+				topFrame.dispose();
+				new ConsultarArquivosView(Auth.autenticaEmail((String)user.get("email")));
 			}
 		});
 		

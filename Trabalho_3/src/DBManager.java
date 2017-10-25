@@ -33,7 +33,7 @@ public class DBManager {
 	
 	public static boolean addUser(String name, String email, String group, String salt, String senha, String certDig) {
 		return insertIntoDb(String.format("INSERT INTO User VALUES "
-				+ "('%s', '%s', '%s', '%s', '%s', 1, 0, null, 0, 0, '%s', 0)"
+				+ "('%s', '%s', '%s', '%s', '%s', 1, 0, null, 0, 0, '%s', 0, 0)"
 				, name, email, group, salt, senha, certDig)
 			);
 	}
@@ -58,6 +58,10 @@ public class DBManager {
 		return selectFromDb(String.format("SELECT * FROM TanList WHERE email = '%s' AND usada = 0", email));
 	}
 	
+	public static int retornaNumUsuarios() {
+		return selectFromDb(String.format("SELECT * FROM User")).size();
+	}
+	
 	public static boolean insereTan(String tan, String email, int posicao) {
 		return insertIntoDb(String.format("INSERT INTO TanList (email, tan, usada, posicao) VALUES ('%s', '%s', 0, %d)", email, tan, posicao));
 	}
@@ -66,18 +70,31 @@ public class DBManager {
 		return selectFromDb(String.format("SELECT * FROM User WHERE email = '%s'", email));
 	}
 	
-	public static boolean alterarSenha(String novaSenha, String email) {
-		if (Auth.verificaRegrasSenha(novaSenha) == false)
-			return false;
-		updateDb(String.format("UPDATE User SET senha = '%s' WHERE email = '%s'", novaSenha, email));
-		return true;
+	public static void descartaTanList(String email) {
+		 updateDb(String.format("UPDATE TanList SET usada = 1 WHERE email = '%s'", email));
+	}
+	
+	public static void alterarCertificadoDigital(String certificado, String email) {
+		updateDb(String.format("UPDATE User SET certificado = '%s' WHERE email = '%s'", certificado, email));
+	}
+	
+	public static void alterarSenha(String novaSenha, String email) {
+		updateDb(String.format("UPDATE User SET passwordDigest = '%s' WHERE email = '%s'", novaSenha, email));
 	}
 	
 	public static void incrementaAcessoErrado(String email) {
 		updateDb(String.format("UPDATE User SET numAcessoErrados = numAcessoErrados + 1, ultimaTentativa = datetime('now') WHERE email = '%s'", email));
 	}
 	
+	public static void incrementaTanErrada(String email) {
+		updateDb(String.format("UPDATE User SET numTanErrada = numTanErrada + 1, ultimaTentativa = datetime('now') WHERE email = '%s'", email));
+	}
+	
 	public static void zeraAcessoErrado(String email) {
+		updateDb(String.format("UPDATE User SET numTanErrada = 0 WHERE email = '%s'", email));
+	}
+	
+	public static void zeraTanoErrado(String email) {
 		updateDb(String.format("UPDATE User SET numAcessoErrados = 0 WHERE email = '%s'", email));
 	}
 	

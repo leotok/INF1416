@@ -2,7 +2,11 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,20 +39,49 @@ public class LoginView extends JFrame {
 		loginButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
 				HashMap user = Auth.autenticaEmail(loginField.getText());
-				if (user != null) {
-					System.out.println("Email ok");
-					dispose();
-					new SenhaView(user);
-					
+				if (user == null) {
+					JOptionPane.showMessageDialog(null, "Usuário não identificado.");
 				}
 				else {
-					System.out.println("Email nao ok");
+					Integer acessosNegados = ((Integer) user.get("numAcessoErrados"));
+					Integer tanNegados = ((Integer) user.get("numTanErrada"));
+					System.out.println(acessosNegados);
+					if (acessosNegados >= 3 || tanNegados >= 3) {	
+						String ultimaTentativa = (String) user.get("ultimaTentativa");
+						SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						
+						Date horario = null;
+						try {
+							horario = formatter.parse(ultimaTentativa);
+						} catch (ParseException e1) {
+							e1.printStackTrace();
+							System.exit(1);
+						}
+						
+						Calendar cal = Calendar.getInstance();
+						cal.setTime(new Date());
+						cal.add(Calendar.MINUTE, -2);
+						cal.add(Calendar.HOUR, 2);// fuso horario
+						System.out.println(horario);
+						System.out.println(cal.getTime());
+						if (horario.before(cal.getTime())) {
+							DBManager.zeraAcessoErrado((String) user.get("email"));
+							user = Auth.autenticaEmail((String) user.get("email"));
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Usuário com acesso bloquado.");
+						}
+					}
+					else {
+						dispose();
+						new SenhaView(user);
+					}
 				}
 			}
 		});
 		
-		loginLabel.setBounds(30, 50, 300, 30);
-		loginField.setBounds(30, 80, 300, 40);
+		loginLabel.setBounds(30, 50, 300, 40);
+		loginField.setBounds(30, 90, 300, 40);
 		loginButton.setBounds(30, 150, 300, 40);
 		
 		

@@ -196,7 +196,7 @@ public class Auth {
 	}
 	
 	
-	public static boolean cadastraUsuario(String grupo, String senha, String pathCert) {
+	public static boolean cadastraUsuario(String grupo, String senha, String pathCert, String pathTanList) {
 		if (Auth.verificaRegrasSenha(senha) == false)
 			return false;
 		
@@ -206,6 +206,7 @@ public class Auth {
 			certDigBytes = Files.readAllBytes(cdPath);
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
 		
 		X509Certificate cert = leCertificadoDigital(certDigBytes);
@@ -221,7 +222,11 @@ public class Auth {
 		String salt = Auth.geraSalt();
 		String senhaProcessada = Auth.geraSenhaProcessada(senha, salt);    
 		
-		return DBManager.addUser(nome, email, grupo, salt, senhaProcessada, certToString(cert));
+		boolean ret = DBManager.addUser(nome, email, grupo, salt, senhaProcessada, certToString(cert));
+		if (ret) {
+			Auth.geraTanList(pathTanList, 10, email);
+		}
+		return ret;
 	}
 
 	public static HashMap autenticaEmail(String email) {
@@ -240,7 +245,6 @@ public class Auth {
 		String senhaDigest = Auth.geraSenhaProcessada(senha, (String) user.get("salt"));
 		if (user.get("passwordDigest").equals(senhaDigest))
 			return true;
-		DBManager.incrementaAcessoErrado((String) user.get("email"));
 		return false;
 	}
 	
@@ -312,7 +316,7 @@ public class Auth {
 			
 			if (Character.getNumericValue(cProx) != Character.getNumericValue(c) + 1)
 				crescente = false;
-			else if (Character.getNumericValue(cProx) != Character.getNumericValue(c) - 1)
+			if (Character.getNumericValue(cProx) != Character.getNumericValue(c) - 1)
 				decrescente = false;
 			if (cProx == c )
 				return false;	

@@ -1,8 +1,12 @@
 import javax.swing.*;
+import java.util.Date;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -73,19 +77,31 @@ public class SenhaView extends JFrame {
 		
 		loginButton.addActionListener(new ActionListener () {
 			public void actionPerformed(ActionEvent e) {
+				HashMap updatedUser = Auth.autenticaEmail((String) user.get("email"));
+				Integer acessosNegados = ((Integer) updatedUser.get("numAcessoErrados"));
+				
+				if (acessosNegados >= 3) {					
+					JOptionPane.showMessageDialog(null, "Senha incorreta. Número total de erros atingido. Aguarde até 2 minutos para tentar novamente.");
+					dispose();
+					new LoginView();
+				}
+				
 				int tamSenha = passwordField.getText().length();
 				if (tamSenha < 6 || tamSenha > 8) {
-					System.out.println("Tamanho invalido");
+					JOptionPane.showMessageDialog(null, "Senha deve conter de 6 a 8 números.");
+					return;
+				}
+				if (Auth.verificaArvoreSenha(root, updatedUser, "")) {
+					DBManager.zeraAcessoErrado((String)updatedUser.get("email"));
+					dispose();
+					new TanListView(Auth.autenticaEmail((String)updatedUser.get("email")));
 				}
 				else {
-					if (Auth.verificaArvoreSenha(root, user, "")) {
-						System.out.println("Senha correta!");
-						dispose();
-						new TanListView(user);
-					}
-					else {
-						System.out.println("Senha incorreta");
-					}
+					JOptionPane.showMessageDialog(null, "Senha incorreta");
+					DBManager.incrementaAcessoErrado((String)updatedUser.get("email"));
+					root = new Node("");;
+					passwordField.setText("");
+					numCliques = 0;
 				}
 			}
 		});

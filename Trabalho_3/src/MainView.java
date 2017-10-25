@@ -32,6 +32,52 @@ public class MainView extends JFrame {
 		Container c = getContentPane();
 		c.add(new Header((String)user.get("email"), (String)user.get("groupName"), (String)user.get("name")));
 		c.add(new FirstBody("Total de acessos", (int)user.get("totalAcessos")));
-		c.add(new MainButtons());
+		
+		JLabel mainManu = new JLabel("Menu principal:");
+		mainManu.setBounds(30, 150, 300, 40);
+		c.add(mainManu);
+		
+		
+		if (user.get("groupName").equals("administrador")) {
+			JButton cadastroButton = new JButton("Cadastrar novo usuário");
+			cadastroButton.setBounds(30, 200, 300, 40);
+			c.add(cadastroButton);
+			cadastroButton.addActionListener(new ActionListener () {
+				public void actionPerformed (ActionEvent e) {
+					dispose();
+					new CadastroView(user);
+				}
+			});
+		}
+		
+		JButton alterarButton = new JButton("Alterar senha pessoal, certificado digital e TAN List");
+		alterarButton.setBounds(30, 250, 300, 40);
+		c.add(alterarButton);
+		alterarButton.addActionListener(new ActionListener () {
+			public void actionPerformed (ActionEvent e) {
+				dispose();
+				new AlterarView(Auth.autenticaEmail((String)user.get("email")));
+			}
+		});
+		
+		JButton consultarButton = new JButton("Consultar pasta de arquivos secretos");
+		consultarButton.setBounds(30, 300, 300, 40);
+		c.add(consultarButton);
+		consultarButton.addActionListener(new ActionListener () {
+			public void actionPerformed (ActionEvent e) {
+				dispose();
+				new ConsultarArquivosView(Auth.autenticaEmail((String)user.get("email")));
+			}
+		});
+		
+		JButton sairButton = new JButton("Sair do Sistema");
+		sairButton.setBounds(30, 350, 300, 40);
+		c.add(sairButton);
+		sairButton.addActionListener(new ActionListener () {
+			public void actionPerformed (ActionEvent e) {
+				dispose();
+				new SaidaView(Auth.autenticaEmail((String)user.get("email")));
+			}
+		});
 	}	
 }

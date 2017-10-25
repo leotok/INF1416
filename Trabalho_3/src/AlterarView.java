@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Random;
 
 
-public class CadastroView extends JFrame {
+public class AlterarView extends JFrame {
 
 	private final int width = 450;
 	private final int height = 630;
 	
 	private HashMap user = null;
 	
-	public CadastroView(HashMap user) {
+	public AlterarView (HashMap user) {
 		this.user = user;
 		
 		setLayout(null);
@@ -38,7 +38,8 @@ public class CadastroView extends JFrame {
 		Container c = getContentPane();
 		
 		c.add(new Header((String)user.get("email"), (String)user.get("groupName"), (String)user.get("name")));
-		c.add(new FirstBody("Total de usuários do sistema", DBManager.retornaNumUsuarios()));
+		List<HashMap> tanList = DBManager.retornaTanList((String)user.get("email"));
+		c.add(new FirstBody("Total de OTPS", tanList.size()));
 		
 		
 		JLabel certificadoDigitalLabel = new JLabel();
@@ -85,82 +86,70 @@ public class CadastroView extends JFrame {
 			}
 		});
 		
-		JLabel grupoLabel = new JLabel("Grupo:");
-		grupoLabel.setBounds(30, 290, 300, 40);
-		c.add(grupoLabel);
-		String[] choices = {"Usuario", "Administrador"};
-		JComboBox<String> comboBox = new JComboBox<String>(choices);
-		comboBox .setBounds(30, 330, 300, 40);
-		comboBox.setVisible(true);
-		c.add(comboBox );
-		
 		JLabel senhaLabel = new JLabel("Senha:");
-		senhaLabel.setBounds(30, 370, 300, 40);
+		senhaLabel.setBounds(30, 290, 300, 40);
 		c.add(senhaLabel);
 		JPasswordField senhaField = new JPasswordField(); 
-		senhaField.setBounds(30, 410, 300, 40);
+		senhaField.setBounds(30, 330, 300, 40);
 		c.add(senhaField);
 		
 		JLabel senhaConfirmacaoLabel = new JLabel("Confirme a senha:");
-		senhaConfirmacaoLabel.setBounds(30, 450, 300, 40);
+		senhaConfirmacaoLabel.setBounds(30, 370, 300, 40);
 		c.add(senhaConfirmacaoLabel);
 		JPasswordField senhaConfirmacaoField = new JPasswordField(); 
-		senhaConfirmacaoField.setBounds(30, 490, 300, 40);
+		senhaConfirmacaoField.setBounds(30, 410, 300, 40);
 		c.add(senhaConfirmacaoField);
 		
-		JButton cadastrarButton = new JButton("Cadastrar");
-		cadastrarButton.setBounds(30, 530, 300, 40);
-		c.add(cadastrarButton);
-		cadastrarButton.addActionListener(new ActionListener () {
+		JButton alterarButton = new JButton("Alterar e voltar");
+		alterarButton.setBounds(30, 450, 300, 40);
+		c.add(alterarButton);
+		alterarButton.addActionListener(new ActionListener () {
 			public void actionPerformed (ActionEvent e) {
-			
+				String errorMsg = "";
 				String senha = new String( senhaField.getPassword());
-				String confirmacao = new String(senhaConfirmacaoField.getPassword());
-				String grupo = (String) comboBox.getSelectedItem().toString().toLowerCase();
-				
-				Path cdPath = Paths.get(certificadoDigitalLabel.getText());
-				byte[] certDigBytes = null;
-				try {
-					certDigBytes = Files.readAllBytes(cdPath);
-				} catch (Exception a) {
-					a.printStackTrace();
-					return;
-				}
-				
-				X509Certificate cert = Auth.leCertificadoDigital(certDigBytes);
-				String infoString = cert.getVersion() +"\n"+ cert.getNotBefore() +"\n"+ cert.getType() +"\n"+ cert.getIssuerDN() +"\n"+ cert.getSubjectDN();
-				int ret = JOptionPane.showConfirmDialog(null, infoString);
-				
-				if (ret != JOptionPane.YES_OPTION) {
-					System.out.println("Cancelou");
-					return;
-				}
-			
-				
-				if (senha.equals(confirmacao)) {
-					if (Auth.cadastraUsuario(grupo, senha, certificadoDigitalLabel.getText(), tanListLabel.getText())) {
-						JOptionPane.showMessageDialog(null, "Usuário cadastrado!");
-						dispose();
-						new CadastroView(user);
+				if (senha.isEmpty() == false) {
+					String confirmacao = new String(senhaConfirmacaoField.getPassword());
+					if (senha.equals(confirmacao)) {
+						if (Auth.verificaRegrasSenha(senha) == false) {
+							errorMsg += "Senha não está de acordo com a regra.\n";
+						} 
+						else {
+							senha = Auth.geraSenhaProcessada(senha, (String) user.get("salt"));
+							DBManager.alterarSenha(senha, (String) user.get("email")) ;
+						}
 					}
 					else {
-						JOptionPane.showMessageDialog(null, "Não foi possível cadastrar novo usuário.");
+						errorMsg += "Senha e confirmação de senha não são iguais.\n";
 					}
 				}
-				else {
-					JOptionPane.showMessageDialog(null, "Senha e confirmação de senha não são iguais.");
+				
+				String pathCertificado = certificadoDigitalLabel.getText();
+				if (pathCertificado.isEmpty() == false) {
+					Path cdPath = Paths.get(pathCertificado);
+					byte[] certDigBytes = null;
+					try {
+						certDigBytes = Files.readAllBytes(cdPath);
+					} catch (Exception a) {
+						a.printStackTrace();
+						return;
+					}
+					
+					X509Certificate cert = Auth.leCertificadoDigital(certDigBytes);
+					String certString = Auth.certToString(cert);
+					DBManager.alterarCertificadoDigital(certString, (String) user.get("email"));
 				}
 				
-			}
-		});
-		
-		JButton voltarButton = new JButton("Voltar");
-		voltarButton.setBounds(150, 570, 150, 40);
-		c.add(voltarButton);
-		voltarButton.addActionListener(new ActionListener () {
-			public void actionPerformed (ActionEvent e) {
+				String pathTanList = tanListLabel.getText();
+				if (pathTanList.isEmpty() == false) {
+					DBManager.descartaTanList((String) user.get("email"));
+					Auth.geraTanList(pathTanList, 10,  (String) user.get("email"));
+				}
+				
+				if (errorMsg.isEmpty() == false) {
+					JOptionPane.showMessageDialog(null, errorMsg);
+				}
 				dispose();
-				new MainView(user);
+				new MainView(Auth.autenticaEmail((String) user.get("email")));
 			}
 		});
 		
