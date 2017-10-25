@@ -16,3 +16,4 @@ public class Main {
 	}
 }
 // admin@inf1416.puc-rio.br
+// select texto from Registro JOIN Mensagem ON Mensagem.id = Registro.messageId;
